@@ -56,13 +56,13 @@ async def sinfo(ctx):
     embed.add_field(name="Membres",value="Il y a {} utilisateurs".format(len(ctx.message.server.members)))
     embed.set_thumbnail(url=ctx.message.server.icon_url)
 
-    await client.say(embed=embed)
+    await client.say(embed=embed, delete_after = DELETE_AFTER)
 
 # clear : Pour supprimer tous les messages du channel // TODO @author 
 
 @client.command(pass_context = True, aliases=['clea', 'cle', 'cl', 'c'])
 async def clear(ctx, number = 1, author : discord.Member = None):
-    messages = [] 
+    messages = []
     number = int(number)
     async for message in client.logs_from(ctx.message.channel, limit = number + 1):
         if (author is None):
