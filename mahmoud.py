@@ -1,6 +1,9 @@
 # client Mahmoud
 
 import discord
+from urllib.request import 	urlopen as uReq
+from bs4 import BeautifulSoup as soup
+import requests
 from discord.ext import commands
 from discord.ext.commands import Bot
 import asyncio
@@ -18,7 +21,7 @@ from config_bot import *
 
 PREFIX = Config.PREFIX
 TOKEN = Config.TOKEN
-DELETE_AFTER = 5
+DELETE_AFTER = 10
 
 
 client = commands.Bot(command_prefix=PREFIX)
@@ -186,18 +189,35 @@ async def category(ctx,arg = None):
             if str(arg) in category[0]:
                 category_matching.append(category)
         if not category_matching:
-             await client.say("J'ai rien trouvé avec tes mots clés de merde.")
+            await client.say("J'ai rien trouvé avec tes mots clés de merde.", delete_after = DELETE_AFTER)
+            await asyncio.sleep(10)
+            await client.delete_message(ctx.message)
         
     
         cat_chosen = random.choice(category_matching)
     
     cat_chosen_str = '\n'.join(str(e) for e in cat_chosen)
 
-    embed = discord.Embed(name="Résultats : ", description = "J'ai trouvé ça pour toi", color = 0x00ff00)
-    embed.add_field(name="Catégorie",value=str(cat_chosen_str))
+    url_p = Config.URL_P
+    url_f = url_p + '/search/' + cat_chosen_str
+
+    r = requests.get(url_f)
+
+    page_soup = soup(r.content, "html.parser")
+    elements = page_soup.findAll("ul",{"class":"thumbs container"})[0]
+    element = elements.findAll("li",{"class":"thumb sub"})[0]
+    sub_link = element.div.find("a",{"class":"item-link"})['href']
+    link = url_p + sub_link
+    title = element.div.find("a",{"class":"item-link"})['title']
+    site_p = element.div.findAll("span",{"class":"source"})[0].a.findAll(text=True)[0]
+    
+    embed = discord.Embed(name="Résultats : ", color = 0x00ff00)
+    embed.add_field(name="Catégorie",value="["+str(cat_chosen_str)+"]"+"("+str(link)+")")
+    embed.add_field(name='Site',value=str(site_p))
+    embed.add_field(name='Titre',value=str(title))
     embed.set_thumbnail(url='https://ih1.redbubble.net/image.113815690.9530/flat,550x550,075,f.u4.jpg')
 
-    await client.say(embed=embed, delete_after= 10)
+    await client.say(embed=embed, delete_after= DELETE_AFTER)
     await asyncio.sleep(10)
     await client.delete_message(ctx.message)
     
