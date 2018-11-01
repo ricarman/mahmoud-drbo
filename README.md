@@ -21,6 +21,7 @@ pip install PyNaCl
 pip install pychalk
 pip install beautifulsoup4
 pip install requests
+pip install youtube_dl
 ```
 
 Enjoy!
