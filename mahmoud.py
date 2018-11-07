@@ -164,7 +164,7 @@ async def degage(ctx):
     else:
         print("J'étais même pas là connard")
     
-    await client.delete_message(ctx.message)
+    #await client.delete_message(ctx.message)
 
 
 #m 
